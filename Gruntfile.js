@@ -1,11 +1,4 @@
-// Generated on 2015-04-23 using generator-chrome-extension 0.3.1
 'use strict';
-
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
 
@@ -34,9 +27,9 @@ module.exports = function (grunt) {
       },
       js: {
         files: ['<%= config.app %>/scripts/{,*/}*.js'],
-        tasks: ['jshint'],
+        tasks: [],
         options: {
-          livereload: '<%= connect.options.livereload %>'
+          livereload: true
         }
       },
       gruntfile: {
@@ -46,7 +39,7 @@ module.exports = function (grunt) {
         files: ['<%= config.app %>/styles/{,*/}*.css'],
         tasks: [],
         options: {
-          livereload: '<%= connect.options.livereload %>'
+          livereload: true
         }
       },
       livereload: {
@@ -77,22 +70,12 @@ module.exports = function (grunt) {
             '<%= config.app %>'
           ]
         }
-      },
-      test: {
-        options: {
-          open: false,
-          base: [
-            'test',
-            '<%= config.app %>'
-          ]
-        }
       }
     },
 
     // Empties folders to start fresh
     clean: {
-      chrome: {
-      },
+      chrome: {},
       dist: {
         files: [{
           dot: true,
@@ -113,8 +96,7 @@ module.exports = function (grunt) {
       all: [
         'Gruntfile.js',
         '<%= config.app %>/scripts/{,*/}*.js',
-        '!<%= config.app %>/scripts/vendor/*',
-        'test/spec/{,*/}*.js'
+        '!<%= config.app %>/scripts/vendor/*'
       ]
     },
     mocha: {
@@ -205,25 +187,25 @@ module.exports = function (grunt) {
     // minification. These next options are pre-configured if you do not wish
     // to use the Usemin blocks.
     // cssmin: {
-    //   dist: {
-    //     files: {
-    //       '<%= config.dist %>/styles/popup.css': [
-    //         '<%= config.app %>/styles/{,*/}*.css'
-    //       ]
+    //     dist: {
+    //         files: {
+    //             '<%= config.dist %>/styles/main.css': [
+    //                 '<%= config.app %>/styles/{,*/}*.css'
+    //             ]
+    //         }
     //     }
-    //   }
     // },
     // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%= config.dist %>/scripts/scripts.js': [
-    //         '<%= config.dist %>/scripts/scripts.js'
-    //       ]
+    //     dist: {
+    //         files: {
+    //             '<%= config.dist %>/scripts/scripts.js': [
+    //                 '<%= config.dist %>/scripts/scripts.js'
+    //             ]
+    //         }
     //     }
-    //   }
     // },
     // concat: {
-    //   dist: {}
+    //     dist: {}
     // },
 
     // Copies remaining files to places other tasks can use
@@ -237,10 +219,13 @@ module.exports = function (grunt) {
           src: [
             '*.{ico,png,txt}',
             'images/{,*/}*.{webp,gif}',
+            'images/{,*/}*.png',
             '{,*/}*.html',
             'styles/{,*/}*.css',
             'styles/fonts/{,*/}*.*',
             '_locales/{,*/}*.json',
+            'scripts/*.js',
+            'manifest.json'
           ]
         }]
       }
@@ -248,31 +233,19 @@ module.exports = function (grunt) {
 
     // Run some tasks in parallel to speed up build process
     concurrent: {
-      chrome: [
-      ],
+      chrome: [],
       dist: [
-        'imagemin',
-        'svgmin'
-      ],
-      test: [
+        //'imagemin',
+        //'svgmin'
       ]
     },
 
-    // Auto buildnumber, exclude debug files. smart builds that event pages
-    chromeManifest: {
-      dist: {
-        options: {
-          buildnumber: true,
-          indentSize: 2,
-          background: {
-            target: 'scripts/background.js',
-            exclude: [
-              'scripts/chromereload.js'
-            ]
-          }
-        },
-        src: '<%= config.app %>',
-        dest: '<%= config.dist %>'
+    bump: {
+      options: {
+        files: ['app/manifest.json', 'package.json', 'bower.json'],
+        commitFiles: ['.'],
+        commitMessage: 'chore: release v%VERSION%',
+        push: false
       }
     },
 
@@ -280,9 +253,9 @@ module.exports = function (grunt) {
     compress: {
       dist: {
         options: {
-          archive: function() {
+          archive: function () {
             var manifest = grunt.file.readJSON('app/manifest.json');
-            return 'package/Soap4me Checker-' + manifest.version + '.zip';
+            return 'package/soap4me-checker-' + manifest.version + '.zip';
           }
         },
         files: [{
@@ -297,34 +270,35 @@ module.exports = function (grunt) {
 
   grunt.registerTask('debug', function () {
     grunt.task.run([
-      'jshint',
+      //'jshint',
       'concurrent:chrome',
       'connect:chrome',
       'watch'
     ]);
   });
 
-  grunt.registerTask('test', [
-    'connect:test',
-    'mocha'
-  ]);
-
   grunt.registerTask('build', [
     'clean:dist',
-    'chromeManifest:dist',
     'useminPrepare',
     'concurrent:dist',
-    'cssmin',
-    'concat',
-    'uglify',
+    //'cssmin',
+    //'concat',
+    //'uglify',
     'copy',
     'usemin',
     'compress'
   ]);
 
+  grunt.registerTask('release', 'Bump version, update changelog and tag version', function (version) {
+    grunt.task.run([
+      'bump:' + (version || 'patch') + ':bump-only',
+      'build',
+      'bump-commit'
+    ]);
+  });
+
   grunt.registerTask('default', [
-    'jshint',
-    'test',
+    //'jshint',
     'build'
   ]);
 };
