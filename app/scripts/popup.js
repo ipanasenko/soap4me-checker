@@ -1,11 +1,19 @@
 'use strict';
 
-var bg = chrome.extension.getBackgroundPage();
+var bg = chrome.extension.getBackgroundPage(), $shows = jQuery('#shows');
 
 function insertShows(shows) {
-  shows = shows || bg.shows || 'checking for shows...';
+  shows = shows || bg.shows;
 
-  jQuery('#shows').html(shows);
+  bg.setBadge('');
+
+  if (!shows) {
+    $shows.html('checking for shows...');
+    return;
+  }
+
+  bg.saveSettings({latestShow: bg.getShowID(jQuery(shows).eq(0))});
+  $shows.html(shows);
 }
 
 insertShows();

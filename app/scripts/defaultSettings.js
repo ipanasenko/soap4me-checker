@@ -1,7 +1,7 @@
-var soap = 'http://soap4.me';
-var soapify = function (s) {
-  return soap + s;
-};
-var defaultSettings = {
-  latestShow: ''
-};
+var soap = 'http://soap4.me',
+  soapify = function (s) {
+    return soap + s;
+  },
+  defaultSettings = {
+    latestShow: 0
+  };
