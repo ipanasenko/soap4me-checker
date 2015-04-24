@@ -65,14 +65,14 @@ function loadSoapPage(soapPage) {
   return jQuery
     .when(loadSettings(), jQuery.get(soapPage))
     .then(function (settings, soapData) {
-      console.log(settings, soapData);
-
       soapData = jQuery(soapData[0]);
 
       var parsedShows = soapData.find('ul.new'),
         parsedIds = parsedShows.children().toArray().map(getShowID);
 
       parsedShows = shows = parsedShows.html();
+
+      console.log(parsedShows);
 
       if (settings.latestShow === 0) {
         setBadge('');
