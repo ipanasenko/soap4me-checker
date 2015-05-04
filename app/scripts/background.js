@@ -94,7 +94,7 @@ function loadSoapPage(soapPage) {
 
 function initCheck() {
   loadingBadge.show();
-  loadSoapPage(soapify('/new/soap/')).then(loadingBadge.hide);
+  loadSoapPage(soapify('/new/soap/')).always(loadingBadge.hide);
 }
 
 initCheck();
