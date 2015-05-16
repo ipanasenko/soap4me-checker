@@ -33,6 +33,7 @@ var loadingBadge = (function () {
     },
     hide: function () {
       showLoading = false;
+      setBadge('');
     }
   }
 }());
