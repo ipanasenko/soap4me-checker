@@ -73,7 +73,7 @@ function loadSoapPage(soapPage) {
 
       parsedShows = shows = parsedShows.html();
 
-      console.log(parsedShows);
+      console.log(parsedShows, parsedIds);
 
       if (settings.latestShow === 0) {
         setBadge('');
@@ -88,6 +88,9 @@ function loadSoapPage(soapPage) {
         }
         setBadge(newShows);
       }
+
+      settings.latestShow = parsedIds[0];
+      saveSettings(settings);
 
       chrome.runtime.sendMessage({shows: parsedShows});
     });
