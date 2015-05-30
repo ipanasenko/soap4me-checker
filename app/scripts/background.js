@@ -65,6 +65,7 @@ function getShowID(showLi) {
 function loadSoapPage(soapPage) {
   return jQuery
     .when(loadSettings(), jQuery.get(soapPage))
+    .always(loadingBadge.hide)
     .then(function (settings, soapData) {
       soapData = jQuery(soapData[0]);
 
@@ -73,21 +74,23 @@ function loadSoapPage(soapPage) {
 
       parsedShows = shows = parsedShows.html();
 
-      console.log(parsedShows, parsedIds);
+      console.groupCollapsed('response');
+      console.log(parsedShows);
+      console.groupEnd('response');
+      console.log(settings.latestShow, parsedIds);
 
-      if (settings.latestShow === 0) {
-        setBadge('');
-      } else {
-        var newShows;
-        parsedIds.some(function (id, i) {
-          newShows = i;
-          return id === settings.latestShow;
-        });
+      var newShows = '';
+      if (settings.latestShow !== 0) {
+        newShows = parsedIds.filter(function (id) {
+          return id > settings.latestShow;
+        }).length;
+
         if (newShows === 0) {
           newShows = '';
         }
-        setBadge(newShows);
       }
+
+      setBadge(newShows);
 
       settings.latestShow = parsedIds[0];
       saveSettings(settings);
@@ -98,7 +101,7 @@ function loadSoapPage(soapPage) {
 
 function initCheck() {
   loadingBadge.show();
-  loadSoapPage(soapify('/new/soap/')).always(loadingBadge.hide);
+  loadSoapPage(soapify('/new/soap/'));
 }
 
 initCheck();
